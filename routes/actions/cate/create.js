@@ -22,14 +22,17 @@ module.exports = async (req, res) => {
     })
   }
   // 查询分类名称是否已存在
-  const cate = await Cate.findOne({
-    cate_name
-  }).catch(err => {
-    res.send({
+  let cate
+  try {
+    cate = await Cate.findOne({
+      cate_name
+    })
+  } catch (error) {
+    return res.send({
       status: 500,
       message: '添加失败！'
     })
-  })
+  }
   // 已存在则响应客户端错误信息
   if (cate) {
     return res.send({
@@ -38,30 +41,42 @@ module.exports = async (req, res) => {
     })
   }
   // 查询传递参数用户id是否存在
-  const user = await User.findOne({
-    userid
-  }).catch(err => {
-    res.send({
+  let user
+  try {
+    user = await User.findOne({
+      userid
+    })
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '添加失败！'
     })
-  })
+  }
   if (user) {
     // 定义分类ID
     let cate_id
-    const cateCount = await Cate.countDocuments().catch(err => {
-      res.send({
+    let cateCount
+    try {
+      cateCount = await Cate.countDocuments()
+    } catch (error) {
+      console.log(error)
+      return res.send({
         status: 500,
         message: '添加失败！'
       })
-    })
+    }
     if (cateCount) {
-      const recentlyCate = (await Cate.find().sort('-create_date').catch(err => {
-        res.send({
+      let recentlyCate
+      try {
+        recentlyCate = (await Cate.find().sort('-create_date'))[0]
+      } catch (error) {
+        console.log(error)
+        return res.send({
           status: 500,
           message: '添加失败！'
         })
-      }))[0]
+      }
       const recentlyCateId = recentlyCate.cate_id
       cate_id = recentlyCateId - 0 + 1 + ''
     } else {
@@ -69,16 +84,20 @@ module.exports = async (req, res) => {
     }
     // 分类创建者的 ObjectId
     const create_user = user._id
-    const cate = await Cate.create({
-      cate_id,
-      cate_name,
-      create_user
-    }).catch(err => {
-      res.send({
+    let cate
+    try {
+      cate = await Cate.create({
+        cate_id,
+        cate_name,
+        create_user
+      })
+    } catch (error) {
+      console.log(error)
+      return res.send({
         status: 500,
         message: '添加失败！'
       })
-    })
+    }
     res.send({
       data: cate,
       status: 200,

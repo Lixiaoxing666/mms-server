@@ -11,21 +11,25 @@ module.exports = async (req, res) => {
     })
   }
   // 查询药品信息
-  const medicineInfo = await Medicine.findOne({
-    med_id: req.params.id
-  }).populate('med_cate').catch(err => {
-    res.send({
+  let medicineInfo
+  try {
+    medicineInfo = await Medicine.findOne({
+      med_id: req.params.id
+    }).populate('med_cate')
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询药品信息失败！'
     })
-  })
+  }
   if (medicineInfo) {
     res.send({
       data: medicineInfo,
       status: 200,
       message: '查询药品信息成功！'
     })
-  }else {
+  } else {
     res.send({
       status: 400,
       message: '查询药品信息失败(该药品信息不存在)！'

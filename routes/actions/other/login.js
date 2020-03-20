@@ -32,24 +32,32 @@ module.exports = async (req, res) => {
     })
   }
   // 查询用户ID是否存在
-  const user = await User.findOne({
-    userid: userid
-  }).catch(err => {
-    res.send({
+  let user
+  try {
+    user = await User.findOne({
+      userid: userid
+    })
+  } catch (error) {
+    console.log(error)
+    return res.send({
       data: null,
       status: 500,
       message: '服务端发生错误！'
     })
-  })
+  }
   // 若用户ID存在，执行密码匹配验证; 不存在则响应 C 错误信息
   if (user) {
-    const isCorrect = await bcrypt.compare(password, user.password).catch(error => {
-      res.send({
+    let isCorrect
+    try {
+      isCorrect = await bcrypt.compare(password, user.password)
+    } catch (error) {
+      console.log(error)
+      return res.send({
         data: null,
         status: 500,
         message: '服务端发生错误！'
       })
-    })
+    }
     if (isCorrect) {
       const _id = user._id
       const jwt = new JwtUtil(_id)

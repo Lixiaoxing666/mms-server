@@ -6,18 +6,26 @@ const {
 const Source = require('../../../models/Source')
 
 module.exports = async (req, res) => {
-  const userCount = await User.countDocuments().catch(err => {
-    res.send({
+  let userCount
+  try {
+    userCount = await User.countDocuments()
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '获取系统管理员数量失败！'
     })
-  })
-  const sourceCount = await Source.countDocuments().catch(err => {
-    res.send({
+  }
+  let sourceCount
+  try {
+    sourceCount = await Source.countDocuments()
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '获取药品来源商数量失败！'
     })
-  })
+  }
   res.send({
     data: {
       userCount,

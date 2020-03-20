@@ -22,23 +22,31 @@ module.exports = async (req, res) => {
   pagesize = pagesize - 0
   pagenum = pagenum - 0
   // 查询分类列表总条目
-  const total = await Cate.find({
-    cate_name: query
-  }).countDocuments().catch(err => {
-    res.send({
+  let total
+  try {
+    total = await Cate.find({
+      cate_name: query
+    }).countDocuments()
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询分类列表失败！'
     })
-  })
+  }
   // 查询符合条件的分类列表
-  const queryResult = await Cate.find({
-    cate_name: query
-  }).populate('create_user').skip((pagenum - 1) * pagesize).limit(pagesize).catch(err => {
-    res.send({
+  let queryResult
+  try {
+    queryResult = await Cate.find({
+      cate_name: query
+    }).populate('create_user').skip((pagenum - 1) * pagesize).limit(pagesize)
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询分类列表失败！'
     })
-  })
+  }
   res.send({
     data: {
       cateList: queryResult,

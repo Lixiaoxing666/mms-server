@@ -13,11 +13,15 @@ module.exports = async (req, res) => {
     message: '服务端发生错误！'
   }
   // 查询是否已存在该姓名的用户
-  const user = await User.findOne({
-    username: req.body.username
-  }).catch(err => {
-    res.send(serverError)
-  })
+  let user
+  try {
+    user = await User.findOne({
+      username: req.body.username
+    })
+  } catch (error) {
+    console.log(error)
+    return res.send(serverError)
+  }
   // 若已存在，则中断程序执行 相应 C 错误信息
   if (user) {
     return res.send({
@@ -26,7 +30,13 @@ module.exports = async (req, res) => {
     })
   }
   // 生成新用户的 userid
-  const recentlyUser = (await User.find().sort('-create_date'))[0]
+  let recentlyUser
+  try {
+    recentlyUser = (await User.find().sort('-create_date'))[0]
+  } catch (error) {
+    console.log(error)
+    return res.send(serverError)
+  }
   const recentlyUserId = recentlyUser.userid
   let newUserId
   if (recentlyUserId[1] === '1') {
@@ -57,17 +67,28 @@ module.exports = async (req, res) => {
     })
   }
   // 密码加密
-  const salt = await bcrypt.genSalt(10).catch(err => {
-    res.send(serverError)
-  })
-  const finalPassword = await bcrypt.hash(newUserPassword, salt).catch(err => {
-    res.send(serverError)
-  })
+  let salt
+  try {
+    salt = await bcrypt.genSalt(10)
+  } catch (error) {
+    console.log(error)
+    return res.send(serverError)
+  }
+  let finalPassword
+  try {
+    finalPassword = await bcrypt.hash(newUserPassword, salt)
+  } catch (error) {
+    console.log(error)
+    return res.send(serverError)
+  }
   newUser.password = finalPassword
   // 向数据库添用户
-  User.create(newUser).catch(err => {
-    res.send(serverError)
-  })
+  try {
+    await User.create(newUser)
+  } catch (error) {
+    console.log(error)
+    return res.send(serverError)
+  }
   res.send({
     data: {
       userid: newUserId,

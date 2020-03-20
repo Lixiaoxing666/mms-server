@@ -40,14 +40,18 @@ module.exports = async (req, res) => {
     })
   }
   // 从数据库中更新用户信息
-  const user = await User.updateOne({
-    userid: req.params.id
-  }, req.body).catch(err => {
-    res.send({
+  let user
+  try {
+    user = await User.updateOne({
+      userid: req.params.id
+    }, req.body)
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '修改管理员信息失败！'
     })
-  })
+  }
   res.send({
     data: user,
     status: 200,

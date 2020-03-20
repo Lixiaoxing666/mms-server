@@ -13,14 +13,18 @@ module.exports = async (req, res) => {
     })
   }
   // 查询同编号的厂商是否已存在
-  const source = await Source.findOne({
-    manu_id:req.body.manu_id
-  }).catch(err => {
-    res.send({
+  let source
+  try {
+    source = await Source.findOne({
+      manu_id: req.body.manu_id
+    })
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '添加失败！'
     })
-  })
+  }
   // 如果已存在，响应客户端错误信息
   if (source) {
     return res.send({
@@ -29,12 +33,16 @@ module.exports = async (req, res) => {
     })
   }
   // 向数据库中添加厂商信息
-  const newSource = await Source.create(req.body).catch(err => {
-    res.send({
+  let newSource
+  try {
+    newSource = await Source.create(req.body)
+  } catch (error) {
+    console.log(error);
+    return res.send({
       status: 500,
       message: '添加失败！'
     })
-  })
+  }
   res.send({
     data: newSource,
     status: 200,

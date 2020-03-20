@@ -4,21 +4,25 @@ const Medicine = require('../../../models/Medicine')
 module.exports = async (req, res) => {
   // req.params.id
   console.log(req.params.id);
-  
+
   if (!req.params.id) {
     return res.send({
       status: 400,
       message: '请传递要删除的药品其批准文号！'
     })
   }
-  const medicine = await Medicine.findOne({
-    med_id: req.params.id
-  }).catch(err => {
-    res.send({
+  let medicine
+  try {
+    medicine = await Medicine.findOne({
+      med_id: req.params.id
+    })
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询删除信息失败！'
     })
-  })
+  }
   if (medicine) {
     Medicine.deleteOne({
       med_id: req.params.id

@@ -19,22 +19,21 @@ module.exports = async (req, res) => {
   pagesize = pagesize - 0
   pagenum = pagenum - 0
   // 查询符合条件药品出库记录总项数
-  const total = await Exrecord.find({
-    export_method: 'sell'
-  }).countDocuments().catch(err => {
-    res.send({
+  let total, queryResult
+  try {
+    total = await Exrecord.find({
+      export_method: 'sell'
+    }).countDocuments()
+    queryResult = await Exrecord.find({
+      export_method: 'sell'
+    }).populate('export_user').sort('-export_date').skip((pagenum - 1) * pagesize).limit(pagesize)
+  } catch (error) {
+    console.log(error);
+    return res.send({
       status: 500,
       message: '查询药品出库(售出)记录列表失败！'
     })
-  })
-  const queryResult = await Exrecord.find({
-    export_method: 'sell'
-  }).populate('export_user').sort('-export_date').skip((pagenum - 1) * pagesize).limit(pagesize).catch(err => {
-    res.send({
-      status: 500,
-      message: '查询药品出库(售出)记录列表失败！'
-    })
-  })
+  }
   res.send({
     data: {
       exportSellList: queryResult,

@@ -26,58 +26,78 @@ module.exports = async (req, res) => {
       message: '入库单号已存在！'
     })
   }
-  const userInfo = await User.findOne({
-    userid: req.body.import_user
-  }).catch(err => {
-    res.send({
+  let userInfo
+  try {
+    userInfo = await User.findOne({
+      userid: req.body.import_user
+    })
+  } catch (error) {
+    console.log(error);
+    return res.send({
       status: 500,
       message: '查询管理员信息失败！'
     })
-  })
+  }
   if (userInfo) {
     req.body.import_user = userInfo._id
     // 查询入库药品信息
-    const med_info = await Medicine.findOne({
-      med_id: req.body.med_id
-    }).catch(err => {
-      res.send({
+    let med_info
+    try {
+      med_info = await Medicine.findOne({
+        med_id: req.body.med_id
+      })
+    } catch (error) {
+      console.log(error)
+      return res.send({
         status: 500,
         message: '查询药品信息失败！'
       })
-    })
+    }
     if (med_info) {
       // 查询本次入库的药品是否已有库存信息(库存文档由 药批文号、生产日期、有效日期 决定)
-      const inventInfo = await Inventory.findOne({
-        med_id: req.body.med_id,
-        med_product_date: req.body.med_product_date,
-        med_using_date: req.body.med_using_date
-      }).catch(err => {
-        res.send({
+      let inventInfo
+      try {
+        inventInfo = await Inventory.findOne({
+          med_id: req.body.med_id,
+          med_product_date: req.body.med_product_date,
+          med_using_date: req.body.med_using_date
+        })
+      } catch (error) {
+        console.log(error)
+        return res.send({
           status: 500,
           message: '查询药品库存信息失败！'
         })
-      })
+      }
       if (inventInfo) {
         // 若已存在，进行库存数量统计
         const med_count = inventInfo.med_count + req.body.med_count
         const docId = inventInfo._id
-        const updatedInvent = await Inventory.updateOne({
-          _id: docId
-        }, {
-          med_count
-        }).catch(err => {
-          res.send({
+        let updatedInvent
+        try {
+          updatedInvent = await Inventory.updateOne({
+            _id: docId
+          }, {
+            med_count
+          })
+        } catch (error) {
+          console.log(error)
+          return res.send({
             status: 500,
             message: '更新药品库存信息失败！'
           })
-        })
+        }
         // 确保药品在成功入库以后再创建入库记录
-        const imRecordInfo = await Imrecord.create(req.body).catch(err => {
-          res.send({
+        let imRecordInfo
+        try {
+          imRecordInfo = await Imrecord.create(req.body)
+        } catch (error) {
+          console.log(error)
+          return res.send({
             status: 500,
             message: '创建入库记录失败！'
           })
-        })
+        }
         res.send({
           data: imRecordInfo,
           status: 200,
@@ -88,19 +108,26 @@ module.exports = async (req, res) => {
         const newInventDoc = _.pick(req.body, ['med_id', 'med_product_date', 'med_using_date', 'med_count'])
         newInventDoc.med_name = med_info.med_name
         newInventDoc.med_info = med_info._id
-        await Inventory.create(newInventDoc).catch(err => {
-          res.send({
+        try {
+          await Inventory.create(newInventDoc)
+        } catch (error) {
+          console.log(error)
+          return res.send({
             status: 500,
             message: '更新药品库存信息失败！'
           })
-        })
+        }
         // 确保药品在成功入库以后再添加入库记录
-        const imRecordInfo = await Imrecord.create(req.body).catch(err => {
-          res.send({
+        let imRecordInfo
+        try {
+          imRecordInfo = await Imrecord.create(req.body)
+        } catch (error) {
+          console.log(error)
+          return res.send({
             status: 500,
             message: '创建入库记录失败！'
           })
-        })
+        }
         res.send({
           data: imRecordInfo,
           status: 200,

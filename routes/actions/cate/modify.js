@@ -11,25 +11,33 @@ module.exports = async (req, res) => {
     })
   }
   if (req.body.cate_name.trim().length > 0) {
-    const cate = await Cate.findOne({
-      cate_id: req.params.id
-    }).catch(err => {
-      res.send({
+    let cate
+    try {
+      cate = await Cate.findOne({
+        cate_id: req.params.id
+      })
+    } catch (error) {
+      console.log(error)
+      return res.send({
         status: 500,
         message: '查询分类信息失败！'
       })
-    })
+    }
     if (cate) {
-      const updateCateInfo = await Cate.updateOne({
-        cate_id: req.params.id
-      }, {
-        cate_name: req.body.cate_name
-      }).catch(err => {
-        res.send({
+      let updateCateInfo
+      try {
+        updateCateInfo = await Cate.updateOne({
+          cate_id: req.params.id
+        }, {
+          cate_name: req.body.cate_name
+        })
+      } catch (error) {
+        console.log(error)
+        return res.send({
           status: 500,
           message: '修改分类信息失败！'
         })
-      })
+      }
       res.send({
         data: updateCateInfo,
         status: 200,

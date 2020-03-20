@@ -26,14 +26,18 @@ module.exports = async (req, res) => {
   pagesize = pagesize - 0
   pagenum = pagenum - 0
   // 首先用 query 参数查询用户表，匹配符合用户
-  const userList = await User.find({
-    username: query
-  }).catch(err => {
-    res.send({
+  let userList
+  try {
+    userList = await User.find({
+      username: query
+    })
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询管理员信息列表失败！'
     })
-  })
+  }
   // 初始化 total 、 queryResult 值
   let total = 0
   let queryResult = []
@@ -47,7 +51,7 @@ module.exports = async (req, res) => {
       total += count
       const currentResult = await Imrecord.find({
         import_user: user_obj_id
-      }).populate('import_user')
+      }).populate('import_user').sort('-import_date')
       queryResult = queryResult.concat(currentResult)
     }
   }

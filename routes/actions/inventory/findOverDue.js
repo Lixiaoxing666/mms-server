@@ -19,12 +19,16 @@ module.exports = async (req, res) => {
   pagesize = pagesize - 0
   pagenum = pagenum - 0
   // 查询药品库存列表
-  const storeList = await Inventory.find().populate('med_info').sort('med_using_date').catch(err => {
-    res.send({
+  let storeList
+  try {
+    storeList = await Inventory.find().populate('med_info').sort('med_using_date')
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询药品库存列表失败！'
     })
-  })
+  }
   // 获取库存列表总文档数
   const storeTotal = storeList ? storeList.length : 0
   if (storeList) {

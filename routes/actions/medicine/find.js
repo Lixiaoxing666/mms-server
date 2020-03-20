@@ -22,23 +22,31 @@ module.exports = async (req, res) => {
   pagesize = pagesize - 0
   pagenum = pagenum - 0
   // 查询药品列表总条数
-  const total = await Medicine.find({
-    med_name: query
-  }).countDocuments().catch(err => {
-    res.send({
+  let total
+  try {
+    total = await Medicine.find({
+      med_name: query
+    }).countDocuments()
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询药品列表失败！'
     })
-  })
+  }
   // 查询符合条件的药品列表
-  const queryResult = await Medicine.find({
-    med_name: query
-  }).populate('med_cate').skip((pagenum - 1) * pagesize).limit(pagesize).catch(err => {
-    res.send({
+  let queryResult
+  try {
+    queryResult = await Medicine.find({
+      med_name: query
+    }).populate('med_cate').skip((pagenum - 1) * pagesize).limit(pagesize)
+  } catch (error) {
+    console.log(error);
+    return res.send({
       status: 500,
       message: '查询药品列表失败！'
     })
-  })
+  }
   res.send({
     data: {
       medicineList: queryResult,

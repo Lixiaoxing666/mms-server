@@ -10,14 +10,18 @@ module.exports = async (req, res) => {
       message: '请传递查询参数！'
     })
   }
-  const userInfo = await User.findOne({
-    userid: req.params.id
-  }).select('userid username gender job phone_number role create_date').catch(err => {
-    res.send({
+  let userInfo
+  try {
+    userInfo = await User.findOne({
+      userid: req.params.id
+    }).select('userid username gender job phone_number role create_date')
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询管理员信息失败！'
     })
-  })
+  }
   if (userInfo) {
     res.send({
       data: userInfo,

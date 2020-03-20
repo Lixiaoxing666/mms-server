@@ -10,23 +10,31 @@ module.exports = async (req, res) => {
     })
   }
   if (req.params.id.trim().length > 0) {
-    const source = await Source.findOne({
-      manu_id: req.params.id
-    }).catch(err => {
-      res.send({
+    let source
+    try {
+      source = await Source.findOne({
+        manu_id: req.params.id
+      })
+    } catch (error) {
+      console.log(error);
+      return res.send({
         status: 500,
         message: '更改厂商信息失败！'
       })
-    })
+    }
     if (source) {
-      const updatedSourceInfo = await Source.updateOne({
-        manu_id: req.params.id
-      }, req.body).catch(err => {
-        res.send({
+      let updatedSourceInfo
+      try {
+        updatedSourceInfo = await Source.updateOne({
+          manu_id: req.params.id
+        }, req.body)
+      } catch (error) {
+        console.log(error);
+        return res.send({
           status: 500,
           message: '更改厂商信息失败！'
         })
-      })
+      }
       res.send({
         status: 200,
         message: '更改厂商信息成功！'

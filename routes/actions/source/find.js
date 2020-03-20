@@ -22,23 +22,31 @@ module.exports = async (req, res) => {
   pagesize = pagesize - 0
   pagenum = pagenum - 0
   // 查询厂商列表总条数
-  const total = await Source.find({
-    manufacturer: query
-  }).countDocuments().catch(err => {
-    res.send({
+  let total
+  try {
+    total = await Source.find({
+      manufacturer: query
+    }).countDocuments()
+  } catch (error) {
+    console.log(error);
+    return res.send({
       status: 500,
       message: '查询厂商列表失败！'
     })
-  })
+  }
   // 查询符合条件的厂商列表
-  const queryResult = await Source.find({
-    manufacturer: query
-  }).skip((pagenum - 1) * pagesize).limit(pagesize).catch(err => {
-    res.send({
+  let queryResult
+  try {
+    queryResult = await Source.find({
+      manufacturer: query
+    }).skip((pagenum - 1) * pagesize).limit(pagesize)
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询厂商列表失败！'
     })
-  })
+  }
   res.send({
     data: {
       sourceList: queryResult,

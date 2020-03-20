@@ -39,31 +39,47 @@ module.exports = async (req, res) => {
   const isEqual = (newPassword === checkPassword)
   if (isEqual) {
     // 查询用户ID是否存在
-    const user = await User.findOne({
-      userid: userid
-    }).catch(err => {
-      res.send(serverError)
-    })
+    let user
+    try {
+      user = await User.findOne({
+        userid: userid
+      })
+    } catch (error) {
+      console.log(error)
+      return res.send(serverError)
+    }
     // 若用户ID存在，执行密码匹配验证; 不存在则响应 C 错误信息
     if (user) {
-      const isCorrect = await bcrypt.compare(oldPassword, user.password).catch(error => {
-        res.send(serverError)
-      })
+      let isCorrect
+      try {
+        isCorrect = await bcrypt.compare(oldPassword, user.password)
+      } catch (error) {
+        console.log(error)
+        return res.send(serverError)
+      }
       if (isCorrect) {
         // 旧密码正确
         // 先进行加密
-        const salt = await bcrypt.genSalt(10).catch(err => {
-          res.send(serverError)
-        })
-        const finalPassword = await bcrypt.hash(newPassword, salt)
+        let salt, finalPassword
+        try {
+          salt = await bcrypt.genSalt(10)
+          finalPassword = await bcrypt.hash(newPassword, salt)
+        } catch (error) {
+          console.log(error)
+          return res.send(serverError)
+        }
         // 开始更新数据
-        const userInfo = await User.updateOne({
-          userid
-        }, {
-          password: finalPassword
-        }).catch(err => {
-          res.send(serverError)
-        })
+        let userInfo
+        try {
+          userInfo = await User.updateOne({
+            userid
+          }, {
+            password: finalPassword
+          })
+        } catch (error) {
+          console.log(error);
+          return res.send(serverError)
+        }
         res.send({
           status: 200,
           message: '修改密码成功！',
@@ -83,6 +99,9 @@ module.exports = async (req, res) => {
       })
     }
   } else {
-    res.send({status: 400, message: '两次新密码输入不一致，请重新输入！'})
+    res.send({
+      status: 400,
+      message: '两次新密码输入不一致，请重新输入！'
+    })
   }
 }

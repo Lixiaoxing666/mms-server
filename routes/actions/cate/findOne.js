@@ -11,14 +11,18 @@ module.exports = async (req, res) => {
     })
   }
   // 查询分类信息
-  const cateInfo = await Cate.findOne({
-    cate_id: req.params.id
-  }).populate('create_user').catch(err => {
-    res.send({
+  let cateInfo
+  try {
+    cateInfo = await Cate.findOne({
+      cate_id: req.params.id
+    }).populate('create_user')
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询分类信息失败！'
     })
-  })
+  }
   if (cateInfo) {
     res.send({
       data: cateInfo,

@@ -5,9 +5,13 @@ const {
 
 module.exports = async (req, res, next) => {
   // 查询用户集合
-  const userList = await User.find().select('userid username gender job phone_number role create_date').catch(err => {
-    res.send({status: 500, message: '查询管理员列表失败！'})
-  })
+  let userList
+  try {
+    userList = await User.find().select('userid username gender job phone_number role create_date')
+  } catch (error) {
+    console.log(error)
+    return res.send({status: 500, message: '查询管理员列表失败！'})
+  }
   res.send({
     data: {
       userList

@@ -11,14 +11,18 @@ module.exports = async (req, res) => {
     })
   }
   // 查询厂商信息
-  const sourceInfo = await Source.findOne({
-    manu_id: req.params.id
-  }).catch(err => {
-    res.send({
+  let sourceInfo
+  try {
+    sourceInfo = await Source.findOne({
+      manu_id: req.params.id
+    })
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询厂商信息失败！'
     })
-  })
+  }
   if (sourceInfo) {
     res.send({
       data: sourceInfo,

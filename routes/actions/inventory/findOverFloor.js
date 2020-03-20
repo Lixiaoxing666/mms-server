@@ -20,12 +20,16 @@ module.exports = async (req, res) => {
     })
   }
   // 查询药品列表
-  const medicineList = await Medicine.find().populate('med_cate').catch(err => {
-    res.send({
+  let medicineList
+  try {
+    medicineList = await Medicine.find().populate('med_cate')
+  } catch (error) {
+    console.log(error);
+    return res.send({
       status: 500,
       message: '查询药品信息列表失败！'
     })
-  })
+  }
   // 声明空的药品库存下限预警列表
   let warningList = []
   // 对每一药品进行库存检索

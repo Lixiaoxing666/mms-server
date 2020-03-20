@@ -24,14 +24,18 @@ module.exports = async (req, res) => {
   pagesize = pagesize - 0
   pagenum = pagenum - 0
   // 首先 query 参数查询药品信息表，匹配符合药品
-  const medicineList = await Medicine.find({
-    med_name: query
-  }).catch(error => {
-    res.send({
+  let medicineList
+  try {
+    medicineList = await Medicine.find({
+      med_name: query
+    })
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '查询药品信息列表失败！'
     })
-  })
+  }
   // 初始化 total 、 queryResult 值
   let total = 0
   let queryResult = []

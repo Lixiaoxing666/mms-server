@@ -12,14 +12,18 @@ module.exports = async (req, res) => {
     })
   }
   // 从数据库中删除用户
-  const user = await User.deleteOne({
-    userid: req.params.id
-  }).catch(err => {
-    res.send({
+  let user
+  try {
+    user = await User.deleteOne({
+      userid: req.params.id
+    })
+  } catch (error) {
+    console.log(error)
+    return res.send({
       status: 500,
       message: '删除失败！'
     })
-  })
+  }
   res.send({
     data: user,
     status: 200,
