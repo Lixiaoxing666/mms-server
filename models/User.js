@@ -59,9 +59,9 @@ const validateUser = user => {
   // 定义对象验证规则
   const schema = {
     userid: Joi.string().regex(/^A[0-9]{4}$/).required().error(new Error('用户ID不符合验证规则')),
-    username: Joi.string().min(2).max(10).required().error(new Error('用户姓名不符合规则')),
+    username: Joi.string().regex(/^[\u4e00-\u9fa5]{2,20}$/).required().error(new Error('用户姓名不符合规则')),
     gender: Joi.string().valid('male', 'female'),
-    job: Joi.string().min(2).max(10).required().error(new Error('用户职务不符合规则')),
+    job: Joi.string().regex(/^[\u4e00-\u9fa5a-zA-Z0-9]{2,20}$/).required().error(new Error('用户职务不符合规则')),
     phone_number: Joi.string().regex(/^[1][3456789]\d{9}$/).required().error(new Error('用户手机号不符合规则')),
     role: Joi.string().valid('root', 'admin'),
     password: Joi.string().regex(/^[a-zA-Z0-9]{6,15}$/).required().error(new Error('密码不符合验证规则'))
